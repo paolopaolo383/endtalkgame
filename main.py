@@ -6,6 +6,13 @@ import random
 import time
 from discord.utils import get
 
+import asyncio
+from warnings import catch_warnings
+import discord
+import os
+from discord.errors import HTTPException
+from discord.utils import get
+
 
 
 reaction_list = ['\U00000030\U0000FE0F\U000020E3','1️⃣', '2️⃣', '3️⃣','\U00000034\U0000FE0F\U000020E3','\U00000035\U0000FE0F\U000020E3','\U00000036\U0000FE0F\U000020E3','\U00000037\U0000FE0F\U000020E3','\U00000038\U0000FE0F\U000020E3','\U00000039\U0000FE0F\U000020E3']
@@ -33,6 +40,14 @@ token = "ODE2NTQ3NTgzOTgzMjIyNzk2.YD8jMg.JQj3Zl3YyQRJ95rrjbkCiOVt19Y"
 isdest = True
 channel_id = 950027527651475536
 
+
+isbad=True
+bad = ["씨발", "ㅅㅂ","Tlqkf","미친년","ㅁㅊ", "지랄","ㅈㄹ","ㅆㅂ","ㅗ","새끼","ㅅㄲ","ㅄ","ㅂㅅ","병신","쒸발","야발","tlqkf","rotoRl","alcls","tprtm","시발","시팔","ㅈ같네","자지","섹스","보지"]
+lastbad = None
+lasttexts = None
+lastbadperson = None
+lasttextperson = None
+
 @client.event
 async def on_ready():
     print("다음으로 로그인합니다")
@@ -55,6 +70,10 @@ async def on_message(message):
     global lists
     global failedplayers
     global reaction_list
+    global lastbad
+    global lasttextperson
+    global lastbadperson
+    global lasttexts
 
     with open('dict.txt', 'r', encoding='UTF-8') as f:
         lists = f.read().splitlines()
@@ -63,7 +82,7 @@ async def on_message(message):
         return None
     # if message.author.name=="멘션을 하면 기부니가 좋아지는 란토":
     # return
-    def check(mg):
+    def checkend(mg):
         global doom
         global word
         global lists
@@ -102,6 +121,9 @@ async def on_message(message):
 
         print("사람이 다름")
         return False
+    if message.content == '코딩':
+        channel = message.channel
+        await channel.send('python 3.9')
 
     if message.content == '숙제 보여줘':
         channel = message.channel
@@ -125,11 +147,10 @@ async def on_message(message):
         embed.add_field(name="비밀", value="궁금하면 해봐", inline=False)
         embed.add_field(name="심심해 또는 심심하다", value="심심할 때 처보3", inline=False)
         embed.add_field(name="코딩", value="코딩 정보 알려줌", inline=False)
-        embed.add_field(name="끝말잇기", value="(아직 미완)", inline=False)
-        embed.add_field(name="ㄱㄱ", value="참가/시작", inline=False)
+        embed.add_field(name="ㄱㄱ", value="끝말잇기 참가/시작", inline=False)
         embed.add_field(name="ㅇㅈ", value="유저 확인", inline=True)
         embed.add_field(name="ㅍㄱ", value="방 파괴(방장만 가능)", inline=False)
-        embed.add_field(name="Made by", value="WibaWiba", inline=False)
+        embed.add_field(name="Made by", value="WibaWiba & 이에준", inline=False)
         await channel.send(embed=embed)
 
     if message.content.endswith('아하') or message.content.endswith('ㅇㅎ') or message.content.startswith(
@@ -137,20 +158,7 @@ async def on_message(message):
         channel = message.channel
         await channel.send('알기는 뭘 알아')
 
-    if message.content.endswith('ㅅㅂ') or message.content.startswith('ㅅㅂ') or message.content.endswith(
-            '시발') or message.content.startswith('시발') or message.content.endswith('씨발') or message.content.startswith(
-        '씨발') or message.content.endswith('병신') or message.content.startswith('병신') or message.content.endswith(
-        'ㅗ') or message.content.startswith('ㅗ') or message.content.endswith('ㅄ') or message.content.startswith(
-        'ㅄ') or message.content.endswith('ㅂㅅ') or message.content.startswith('ㅂㅅ') or message.content.endswith(
-        '새끼') or message.content.startswith('새끼') or message.content.endswith('년'):
-        channel = message.channel
-        await channel.send('욕하지 마라')
-
-    if message.content == '이학습터':
-        channel = message.channel
-        await channel.send('https://cls7.edunet.net/cyber/cm/mcom/pmco000b00.do')
-
-    if message.content == '심심해' or message.content == '심심하다':
+    if message.content == '심심해' or message.content == '심심하다' or message.content.startswith('심심하네'):
         channel = message.channel
         await channel.send(random.choice(things))
     if message.content == '야':
@@ -161,7 +169,7 @@ async def on_message(message):
     add = ''
 
     a = len(players)
-    if message.content == 'ㅍㄱ':
+    if message.content == 'ㅍㄱ' or message.content == '파괴':
         i = a + 1
         channel = message.channel
         if len(players) == 0:
@@ -257,7 +265,7 @@ async def on_message(message):
                         now = players[i % playernum]
                         isnot = False
                         try:
-                            mg = await client.wait_for('message', timeout=30.0, check=check)
+                            mg = await client.wait_for('message', timeout=30.0, check=checkend)
                             if isdest: return
                             i += 1
                             if i>99:
@@ -366,12 +374,117 @@ async def on_message(message):
                 i += 1
             await channel.send(embed=embed)
     if message.content.startswith("."):
-
         channel = message.channel
         if message.content.split('.')[1] in lists:
             await channel.send("있는단어")
         else:
             await channel.send("없는단어")
+
+    if message.author.id == 881498177700773889:
+        return
+    isbad = False
+    message_content = message.content
+    for a in bad:
+        if message_content.find(a) >= 0:
+            isbad = True
+            break
+
+    if isbad:
+        # await message.delete()
+        if lastbad == None or not lastbadperson == message.author.id:
+            lastbad = await client.get_channel(950027527651475536).send(
+                "<@" + str(message.author.id) + "> 경고! - 비속어 - " + message.content + " - 1번")  # 경고
+            lastbadperson = message.author.id
+            return
+
+        wordlist = lastbad.content.split(" - ")[2].split(", ")
+        isinclude = False
+        for word in wordlist:
+            if word == message.content:
+                isinclude = True
+                break
+        if isinclude:
+            first = lastbad.content.split(" - ")[0] + " - 비속어 - "
+            middle = lastbad.content.split(" - ")[2] + " - "
+            last = str(int(lastbad.content.split(" - ")[3][0]) + 1) + "번"
+            try:
+                await lastbad.edit(content=first + middle + last)  # 경고
+            except:
+                lastbad = await client.get_channel(950027527651475536).send(
+                    "<@" + str(message.author.id) + "> 경고! - 비속어 - " + message.content + " - 1번")  # 경고
+                lastbadperson = message.author.id
+                return
+        else:
+            first = lastbad.content.split(" - ")[0] + " - 비속어 - "
+            middle = lastbad.content.split(" - ")[2] + ", " + message.content + " - "
+            last = str(int(lastbad.content.split(" - ")[3][0]) + 1) + "번"
+            try:
+                await lastbad.edit(content=first + middle + last)  # 경고
+            except:
+                lastbad = await client.get_channel(950027527651475536).send(
+                    "<@" + str(message.author.id) + "> 경고! - 비속어 - " + message.content + " - 1번")  # 경고
+                lastbadperson = message.author.id
+                return
+
+        return
+
+    s = message.content.split(" ")
+
+    def check(m):
+        return message.author.id == m.author.id
+
+    try:
+        msg1 = await client.wait_for('message', check=check)
+    except TimeoutError:
+        return
+    if msg1.content == message.content:
+        try:
+            msg2 = await client.wait_for('message', check=check)
+        except TimeoutError:
+            return
+        if msg2.content == message.content:
+            if lasttexts == None or not lasttextperson == message.author.id:
+                lasttexts = await client.get_channel(950027527651475536).send(
+                    "<@" + str(message.author.id) + "> 경고! - 도배 - " + message.content + " - 3번")  # 경고
+                lasttextperson = message.author.id
+                return
+            wordlist = lasttexts.content.split(" - ")[2].split(", ")
+            isinclude = False
+            for word in wordlist:
+                if word == message.content:
+                    isinclude = True
+                    break
+            if isinclude:
+                first = lasttexts.content.split(" - ")[0] + " - 도배 - "
+                middle = lasttexts.content.split(" - ")[2] + " - "
+                last = str(int(lasttexts.content.split(" - ")[3][0]) + 1) + "번"
+                try:
+                    await lasttexts.edit(content=first + middle + last)  # 경고
+                except:
+                    lasttexts = await client.get_channel(950027527651475536).send(
+                        "<@" + str(message.author.id) + "> 경고! - 도배 - " + message.content + " - 3번")  # 경고
+                    lasttextperson = message.author.id
+                    return
+            else:
+                first = lasttexts.content.split(" - ")[0] + " - 도배 - "
+                middle = lasttexts.content.split(" - ")[2] + ", " + message.content + " - "
+                last = str(int(lasttexts.content.split(" - ")[3][0]) + 3) + "번"
+                try:
+                    await lasttexts.edit(content=first + middle + last)  # 경고
+                except:
+                    lasttexts = await client.get_channel(950027527651475536).send(
+                        "<@" + str(message.author.id) + "> 경고! - 도배 - " + message.content + " - 3번")  # 경고
+                    lasttextperson = message.author.id
+                    return
+
+            # await message.delete()
+            # await msg2.delete()
+            # await msg1.delete()
+            return
+        else:
+            return
+    else:
+        return
 
 
 client.run('ODgxNDk4MTc3NzAwNzczODg5.Gq7ao5.miN6PCIAXzlxlA4pxt4BD4SMO_sXYLb8jclHOo')
