@@ -38,7 +38,7 @@ start = ['가', '나', '다', '라', '마', '바', '음', '누', '스', '고', '
 lists = []
 token = "ODE2NTQ3NTgzOTgzMjIyNzk2.YD8jMg.JQj3Zl3YyQRJ95rrjbkCiOVt19Y"
 isdest = True
-channel_id = 950027527651475536
+channel_id = 881498177700773889
 
 
 isbad=True
@@ -54,7 +54,8 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print("================")
-    await client.get_channel(channel_id).send('시작')
+    await client.change_presence(status=discord.Status.offline, activity = discord.Game('상태메시지'))
+
 
 
 @client.event
@@ -80,6 +81,7 @@ async def on_message(message):
 
     if message.author.bot:
         return None
+    print("메시지")
     # if message.author.name=="멘션을 하면 기부니가 좋아지는 란토":
     # return
     def checkend(mg):
@@ -265,7 +267,7 @@ async def on_message(message):
                         now = players[i % playernum]
                         isnot = False
                         try:
-                            mg = await client.wait_for('message', timeout=30.0, check=checkend)
+                            mg = await client.wait_for('message', timeout=20.0, check=checkend)
                             if isdest: return
                             i += 1
                             if i>99:
@@ -309,19 +311,17 @@ async def on_message(message):
                         if isdest: return
                         if not isnot:
                             ho = mg.content
-                            print(mg.content)
                             await channel.send(now + '님이[' + ho + ']를 입력하셨습니다.')
                             word[0] = ho[len(ho) - 1]
-                            print(ho)
                             word[1] = ' '
                             for doomb in doom:
                                 if doomb[0] == word[0]:
                                     word[1] = doomb[1]
                         if isdest: return
                         if word[1] == ' ':
-                            await channel.send("<@"+str(playersid[i % playernum]) + '>님은 30초 안에 [' + word[0] + ']로 시작하는 단어를 써주세요.')
+                            await channel.send("<@"+str(playersid[i % playernum]) + '>님은 20초 안에 [' + word[0] + ']로 시작하는 단어를 써주세요.')
                         else:
-                            await channel.send("<@"+str(playersid[i % playernum]) + '>님은 30초 안에 [' + word[0] + ']또는 [' + word[
+                            await channel.send("<@"+str(playersid[i % playernum]) + '>님은 20초 안에 [' + word[0] + ']또는 [' + word[
                                 1] + ']로 시작하는 단어를 써주세요.')
 
 
@@ -354,8 +354,14 @@ async def on_message(message):
         if message.author.name == '이예준' and len(players) > 0:
             players.append("이예준")
             playersid.append(596708010768990209)
-            await channel.send('테스트 플레이어가 참가했습니다')
-        elif not message.author.name == '이예준':
+            await channel.send('테스트 플레이어(이예준)가 참가했습니다')
+
+        elif message.author.name == '러마' and len(players) > 0:
+            players.append("러마")
+            playersid.append(709533146034602084)
+            await channel.send('테스트 플레이어(러마)가 참가했습니다')
+
+        elif not message.author.name == '이예준' and not message.author.name == '러마':
             await channel.send('관리자만 테스트 플레이어를 추가 할 수 있습니다')
         elif isgaming:
             await channel.send("이미 게임이 시작되었습니다")
@@ -380,113 +386,7 @@ async def on_message(message):
         else:
             await channel.send("없는단어")
 
-    if message.author.id == 881498177700773889:
-        return
-    isbad = False
-    message_content = message.content
-    for a in bad:
-        if message_content.find(a) >= 0:
-            isbad = True
-            break
 
-    if isbad:
-        # await message.delete()
-        if lastbad == None or not lastbadperson == message.author.id:
-            lastbad = await client.get_channel(950027527651475536).send(
-                "<@" + str(message.author.id) + "> 경고! - 비속어 - " + message.content + " - 1번")  # 경고
-            lastbadperson = message.author.id
-            return
-
-        wordlist = lastbad.content.split(" - ")[2].split(", ")
-        isinclude = False
-        for word in wordlist:
-            if word == message.content:
-                isinclude = True
-                break
-        if isinclude:
-            first = lastbad.content.split(" - ")[0] + " - 비속어 - "
-            middle = lastbad.content.split(" - ")[2] + " - "
-            last = str(int(lastbad.content.split(" - ")[3][0]) + 1) + "번"
-            try:
-                await lastbad.edit(content=first + middle + last)  # 경고
-            except:
-                lastbad = await client.get_channel(950027527651475536).send(
-                    "<@" + str(message.author.id) + "> 경고! - 비속어 - " + message.content + " - 1번")  # 경고
-                lastbadperson = message.author.id
-                return
-        else:
-            first = lastbad.content.split(" - ")[0] + " - 비속어 - "
-            middle = lastbad.content.split(" - ")[2] + ", " + message.content + " - "
-            last = str(int(lastbad.content.split(" - ")[3][0]) + 1) + "번"
-            try:
-                await lastbad.edit(content=first + middle + last)  # 경고
-            except:
-                lastbad = await client.get_channel(950027527651475536).send(
-                    "<@" + str(message.author.id) + "> 경고! - 비속어 - " + message.content + " - 1번")  # 경고
-                lastbadperson = message.author.id
-                return
-
-        return
-
-    s = message.content.split(" ")
-
-    def check(m):
-        return message.author.id == m.author.id
-
-    try:
-        msg1 = await client.wait_for('message', check=check)
-    except TimeoutError:
-        return
-    if msg1.content == message.content:
-        try:
-            msg2 = await client.wait_for('message', check=check)
-        except TimeoutError:
-            return
-        if msg2.content == message.content:
-            if lasttexts == None or not lasttextperson == message.author.id:
-                lasttexts = await client.get_channel(950027527651475536).send(
-                    "<@" + str(message.author.id) + "> 경고! - 도배 - " + message.content + " - 3번")  # 경고
-                lasttextperson = message.author.id
-                return
-            wordlist = lasttexts.content.split(" - ")[2].split(", ")
-            isinclude = False
-            for word in wordlist:
-                if word == message.content:
-                    isinclude = True
-                    break
-            if isinclude:
-                first = lasttexts.content.split(" - ")[0] + " - 도배 - "
-                middle = lasttexts.content.split(" - ")[2] + " - "
-                last = str(int(lasttexts.content.split(" - ")[3][0]) + 1) + "번"
-                try:
-                    await lasttexts.edit(content=first + middle + last)  # 경고
-                except:
-                    lasttexts = await client.get_channel(950027527651475536).send(
-                        "<@" + str(message.author.id) + "> 경고! - 도배 - " + message.content + " - 3번")  # 경고
-                    lasttextperson = message.author.id
-                    return
-            else:
-                first = lasttexts.content.split(" - ")[0] + " - 도배 - "
-                middle = lasttexts.content.split(" - ")[2] + ", " + message.content + " - "
-                last = str(int(lasttexts.content.split(" - ")[3][0]) + 3) + "번"
-                try:
-                    await lasttexts.edit(content=first + middle + last)  # 경고
-                except:
-                    lasttexts = await client.get_channel(950027527651475536).send(
-                        "<@" + str(message.author.id) + "> 경고! - 도배 - " + message.content + " - 3번")  # 경고
-                    lasttextperson = message.author.id
-                    return
-
-            # await message.delete()
-            # await msg2.delete()
-            # await msg1.delete()
-            return
-        else:
-            return
-    else:
-        return
-
-
-client.run('ODgxNDk4MTc3NzAwNzczODg5.Gq7ao5.miN6PCIAXzlxlA4pxt4BD4SMO_sXYLb8jclHOo')
+client.run('ODgxNDk4MTc3NzAwNzczODg5.GZoWrC.7_jlReSWm8PR6lmF3Je9paizV9VHI_LjuvVZZU')
 
 
